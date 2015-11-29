@@ -12,14 +12,16 @@ serverSocket.settimeout(CHECK_TIME)
 befotime = 0
 thistime = 0
 miss_check_time = time.time()
-miss_list = []
+miss_list = set()
 while True:
     rand = random.randint(0, 10)    
     try:
         message, address = serverSocket.recvfrom(1024)
         if rand < 4: 
-            miss_list.append(int(message.split()[1]))
+            miss_list.add(int(message.split()[1]))
             continue
+        index = int(message.split()[1])
+        miss_list.discard(index)
         message = message.upper()
         if befotime:
             befotime = thistime
@@ -40,11 +42,7 @@ while True:
     finally:
         if (time.time() - miss_check_time) > CHECK_TIME and len(miss_list)>0:
             print ("missing Ping numbers ")
-            for i in miss_list:
-                print ("%d, " %i),
-                try:
-                    miss_list.remove(i)
-                except Exception as e:
-                    continue
+            for i in range(len(miss_list)):
+                print (miss_list.pop()),
             print ""
             miss_check_time = time.time()

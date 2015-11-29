@@ -12,7 +12,9 @@ BEAT_PERIOD = 3
 sock = socket(AF_INET, SOCK_DGRAM)
 sock.settimeout(1)
 index = 0
+count = 0
 while True:
+    count +=1
     index +=1
     curtime =  time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
     mesg = "ping %d "%index + "\t" + curtime
@@ -32,9 +34,12 @@ while True:
         time.sleep(BEAT_PERIOD)
     except Exception as e:
         print "Request timed out"
+        print "retry send the message index %d"%index
+        index -=1
+        continue 
     except KeyboardInterrupt:
         print "minimum %f ms, maximum %f ms, average %f ms " %(min_time*1000, max_time *1000, sum_time / float(nr_recv) * 1000)
-        pck_loss = (float(index-nr_recv))/float(index) * 100.0
+        pck_loss = (float(count-nr_recv))/float(count) * 100.0
         print "packet loss rate is %d" %(pck_loss) + "%"
         exit()
 
