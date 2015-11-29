@@ -1,4 +1,5 @@
 from socket import *
+import time
 import random
 
 serverSocket = socket(AF_INET, SOCK_DGRAM)
@@ -8,16 +9,42 @@ CHECK_TIME = 9
 max_index = 0
 min_index = 0 
 serverSocket.settimeout(CHECK_TIME)
-
+befotime = 0
+thistime = 0
+miss_check_time = time.time()
+miss_list = []
 while True:
     rand = random.randint(0, 10)    
     try:
         message, address = serverSocket.recvfrom(1024)
-        message = message.upper()
-        if rand < 4:
+        if rand < 4: 
+            miss_list.append(int(message.split()[1]))
             continue
+        message = message.upper()
+        if befotime:
+            befotime = thistime
+        else:
+            befotime = time.mktime(time.strptime(message.split('\t')[1], "%Y-%m-%d %H:%M:%S"))
+        thistime = time.mktime(time.strptime(message.split('\t')[1], "%Y-%m-%d %H:%M:%S"))
+        term_time = thistime - befotime
+        print "diffrence time : %d" %(int(term_time))
+        
         serverSocket.sendto(message, address)
+    except timeout:
+        print e
+        print "timeout, so cleint is dead"
+        exit()
     except Exception as e:
         print e
-        print "timeout so cleint is dead"
         exit()
+    finally:
+        if (time.time() - miss_check_time) > CHECK_TIME and len(miss_list)>0:
+            print ("missing Ping numbers ")
+            for i in miss_list:
+                print ("%d, " %i),
+                try:
+                    miss_list.remove(i)
+                except Exception as e:
+                    continue
+            print ""
+            miss_check_time = time.time()

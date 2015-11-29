@@ -15,7 +15,7 @@ index = 0
 while True:
     index +=1
     curtime =  time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
-    mesg = "ping %d "%index + " " + curtime
+    mesg = "ping %d "%index + "\t" + curtime
     begin = time.time()
     sock.sendto(mesg , addr)
     try:
