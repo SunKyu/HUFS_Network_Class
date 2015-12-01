@@ -1,3 +1,4 @@
+#Client code
 from socket import *
 import time
 
